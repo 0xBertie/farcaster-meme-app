@@ -21,6 +21,7 @@ export default function MemeEditor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     if (canvasRef.current && !canvas) {
       const fabricCanvas = new fabric.Canvas(canvasRef.current, {
         width: 600,
@@ -107,7 +108,6 @@ export default function MemeEditor() {
     try {
       const user = await initializeSdk();
 
-      // ИСПРАВЛЕНИЕ: используем toDataURL без параметров или с type assertion
       const dataURL = canvas.toDataURL({ format: 'png' });
       const blob = await (await fetch(dataURL)).blob();
       const file = new File([blob], `meme_${Date.now()}.png`, { type: 'image/png' });
@@ -115,7 +115,7 @@ export default function MemeEditor() {
       const { url, error: uploadError } = await uploadImage(file, user.fid);
 
       if (uploadError || !url) {
-        alert('Failed to upload image');
+        alert('Failed to upload image: ' + (uploadError?.message || 'Unknown error'));
         return;
       }
 
@@ -131,9 +131,9 @@ export default function MemeEditor() {
       alert('✅ Meme saved successfully!');
       window.location.href = '/';
 
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Error saving meme');
+      alert('Error: ' + (error.message || 'Failed to save'));
     } finally {
       setSaving(false);
     }
