@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { incrementVote } from '@/lib/db';
 
+// ИСПРАВЛЕНИЕ: добавляем dynamic export
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 const VOTE_PRICE = 0.01;
 
 export async function POST(req: NextRequest) {

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTopMemes, getMemesBySource } from '@/lib/db';
 
+// ИСПРАВЛЕНИЕ: добавляем dynamic export
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;

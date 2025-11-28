@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getMemeTemplates } from '@/lib/db';
 
+// ИСПРАВЛЕНИЕ: добавляем dynamic export
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     const { templates, error } = await getMemeTemplates();

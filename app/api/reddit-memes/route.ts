@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import { fetchCryptoMemes } from '@/lib/reddit';
 import { createMeme, supabase } from '@/lib/db';
 
+// УЖЕ БЫЛО, но добавляем runtime
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const revalidate = 1800;
 
 export async function GET() {
