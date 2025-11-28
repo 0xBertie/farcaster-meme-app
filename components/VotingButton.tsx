@@ -15,11 +15,17 @@ export default function VotingButton({ memeId }: { memeId: string }) {
       const user = await initializeSdk();
       await sdk.actions.ready();
 
-      const payment = await sdk.wallet.sendTransaction({
-        to: process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || '',
-        value: '10000',
-        token: 'USDC',
-        chain: 'base',
+      // ИСПРАВЛЕНИЕ: используем ethProvider вместо wallet.sendTransaction
+      const provider = sdk.wallet.ethProvider;
+
+      // Отправляем транзакцию через eth_sendTransaction
+      const txHash = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          to: process.env.NEXT_PUBLIC_PAYMENT_ADDRESS,
+          value: '0x2710', // 10000 wei в hex (0.01 USDC)
+          chainId: '0x2105', // BASE mainnet
+        }],
       });
 
       const response = await fetch('/api/vote', {
@@ -27,7 +33,7 @@ export default function VotingButton({ memeId }: { memeId: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           memeId,
-          transactionHash: payment.hash,
+          transactionHash: txHash,
           voterFid: user.fid,
         }),
       });
