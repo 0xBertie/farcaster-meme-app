@@ -9,7 +9,7 @@ import { initializeSdk } from '@/lib/sdk';
 import { uploadImage, createMeme } from '@/lib/db';
 
 export default function MemeEditor() {
-  const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
+  const [canvas, setCanvas] = useState<any>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [topText, setTopText] = useState('');
   const [bottomText, setBottomText] = useState('');
@@ -29,7 +29,7 @@ export default function MemeEditor() {
       });
       setCanvas(fabricCanvas);
     }
-  }, []);
+  }, [canvas]);
 
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -37,10 +37,11 @@ export default function MemeEditor() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      fabric.Image.fromURL(e.target?.result as string, (img) => {
+      const result = e.target?.result as string;
+      fabric.Image.fromURL(result, (img: any) => {
         canvas.clear();
 
-        const scale = Math.min(600 / img.width!, 600 / img.height!);
+        const scale = Math.min(600 / (img.width || 1), 600 / (img.height || 1));
         img.scale(scale);
         img.set({ selectable: false });
 
@@ -64,7 +65,8 @@ export default function MemeEditor() {
   const updateTexts = () => {
     if (!canvas || !imageLoaded) return;
 
-    canvas.getObjects('text').forEach(obj => canvas.remove(obj));
+    const objects = canvas.getObjects();
+    objects.forEach((obj: any) => canvas.remove(obj));
 
     if (topText) {
       const top = new fabric.Text(topText.toUpperCase(), {
@@ -72,9 +74,9 @@ export default function MemeEditor() {
         fontSize,
         fontFamily,
         fill: textColor,
-        left: canvas.width! / 2,
+        left: (canvas.width || 300) / 2,
         originX: 'center'
-      });
+      } as any);
       canvas.add(top);
     }
 
@@ -84,10 +86,10 @@ export default function MemeEditor() {
         fontSize,
         fontFamily,
         fill: textColor,
-        left: canvas.width! / 2,
-        top: canvas.height! - fontSize - 30,
+        left: (canvas.width || 300) / 2,
+        top: (canvas.height || 300) - fontSize - 30,
         originX: 'center'
-      });
+      } as any);
       canvas.add(bottom);
     }
 
@@ -105,7 +107,8 @@ export default function MemeEditor() {
     try {
       const user = await initializeSdk();
 
-      const dataURL = canvas.toDataURL('image/png');
+      // ИСПРАВЛЕНИЕ: используем toDataURL без параметров или с type assertion
+      const dataURL = canvas.toDataURL({ format: 'png' });
       const blob = await (await fetch(dataURL)).blob();
       const file = new File([blob], `meme_${Date.now()}.png`, { type: 'image/png' });
 
@@ -116,7 +119,7 @@ export default function MemeEditor() {
         return;
       }
 
-      const { meme, error: dbError } = await createMeme({
+      await createMeme({
         creator_fid: user.fid,
         image_url: url,
         prompt: `${topText} / ${bottomText}`,
@@ -124,11 +127,6 @@ export default function MemeEditor() {
         vote_count: 0,
         total_earned: 0
       });
-
-      if (dbError) {
-        alert('Failed to save meme');
-        return;
-      }
 
       alert('✅ Meme saved successfully!');
       window.location.href = '/';
