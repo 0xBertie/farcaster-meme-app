@@ -3,7 +3,7 @@ import { fetchCryptoMemes } from '@/lib/reddit';
 import { createMeme, supabase } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 1800; // Cache 30 минут
+export const revalidate = 1800;
 
 export async function GET() {
   try {
@@ -20,20 +20,18 @@ export async function GET() {
 
     let savedCount = 0;
 
-    // Сохраняем мемы (пропускаем дубликаты)
     for (const rm of redditMemes) {
       try {
-        // Проверяем нет ли уже такого URL
         const { data: existing } = await supabase
           .from('memes')
           .select('id')
           .eq('image_url', rm.url)
           .single();
 
-        if (existing) continue; // Уже есть
+        if (existing) continue;
 
         await createMeme({
-          creator_fid: 0, // System
+          creator_fid: 0,
           image_url: rm.url,
           thumbnail_url: rm.thumbnail,
           prompt: rm.title,

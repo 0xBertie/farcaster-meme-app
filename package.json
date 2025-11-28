@@ -1,6 +1,6 @@
 {
   "name": "farcaster-meme-voting-app",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,8 +17,7 @@
     "react-dom": "^18.3.0",
     "react-dropzone": "^14.2.3",
     "react-color": "^2.19.3",
-    "sharp": "^0.33.0",
-    "x402-fetch": "^1.0.0"
+    "sharp": "^0.33.0"
   },
   "devDependencies": {
     "@types/node": "^20",

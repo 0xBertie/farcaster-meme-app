@@ -19,7 +19,7 @@ async function fetchRedditJSON(url: string): Promise<any> {
     headers: {
       'User-Agent': USER_AGENT,
     },
-    next: { revalidate: 1800 } // Cache 30 минут
+    next: { revalidate: 1800 }
   });
 
   if (!response.ok) {
@@ -89,7 +89,6 @@ export async function fetchCryptoMemes(limit = 20): Promise<RedditPost[]> {
       }
     }
 
-    // Сортируем по score и убираем дубликаты
     const uniqueMemes = Array.from(
       new Map(allMemes.map(m => [m.url, m])).values()
     );
@@ -136,18 +135,5 @@ export async function fetchTrendingCryptoTopics(): Promise<string[]> {
   } catch (error) {
     console.error('Trending topics fetch error:', error);
     return [];
-  }
-}
-
-// Проверка доступности Reddit
-export async function testRedditConnection(): Promise<boolean> {
-  try {
-    const url = 'https://www.reddit.com/r/cryptocurrency/hot.json?limit=1';
-    const response = await fetch(url, {
-      headers: { 'User-Agent': USER_AGENT }
-    });
-    return response.ok;
-  } catch {
-    return false;
   }
 }
